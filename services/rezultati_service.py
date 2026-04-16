@@ -1,26 +1,13 @@
-from repositories.rezultati_repository import (
-    create_rezultat_repo,
-    update_rezultat_repo,
-    delete_rezultat_repo
-)
+from repositories.rezultati_repository import *
 
 def create_rezultat_service(data):
-    required_fields = ["tk_tekmovalec", "tk_tekmovanje"]
-    for field in required_fields:
-        if field not in data or data[field] in [None, ""]:
-            return {"message": f"Manjka polje: {field}"}
+    return {"id": create_rezultat_repo(data)}
 
-    new_id = create_rezultat_repo(data)
-    return {"message": "Rezultat uspešno dodan", "id": new_id}
+def get_rezultat_service(id):
+    return get_rezultat_repo(id)
 
-def update_rezultat_service(rezultat_id, data):
-    updated = update_rezultat_repo(rezultat_id, data)
-    if updated == 0:
-        return {"message": "Rezultat ne obstaja"}
-    return {"message": "Rezultat uspešno posodobljen"}
+def update_rezultat_service(id, data):
+    return {"updated": update_rezultat_repo(id, data)}
 
-def delete_rezultat_service(rezultat_id):
-    deleted = delete_rezultat_repo(rezultat_id)
-    if deleted == 0:
-        return {"message": "Rezultat ne obstaja"}
-    return {"message": "Rezultat uspešno izbrisan"}
+def delete_rezultat_service(id):
+    return {"deleted": delete_rezultat_repo(id)}

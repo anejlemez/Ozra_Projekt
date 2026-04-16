@@ -1,16 +1,9 @@
 from db import get_connection
 
-def get_admin_by_username_repo(uporabnisko_ime):
+def get_admin_repo(username):
     conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT *
-        FROM admini
-        WHERE uporIme = %s
-    """, (uporabnisko_ime,))
-
-    admin = cursor.fetchone()
-    cursor.close()
+    cur = conn.cursor(dictionary=True)
+    cur.execute("SELECT * FROM admini WHERE uporIme=%s", (username,))
+    data = cur.fetchone()
     conn.close()
-    return admin
+    return data
