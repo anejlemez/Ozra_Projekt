@@ -17,4 +17,4 @@ def update(id):
 
 @rezultati_bp.route("/rezultati/<int:id>", methods=["DELETE"])
 def delete(id):
-    return jsonify(delete_rezultat_service(id))
+    return jsonify(delete_rezultat_service(id, request.get_json(silent=True) or {}))

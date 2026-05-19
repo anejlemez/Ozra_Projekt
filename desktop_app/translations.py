@@ -1,0 +1,62 @@
+TRANSLATIONS = {
+    "sl": {
+        "app_title": "Administracija triatlonskih rezultatov",
+        "login": "Prijava",
+        "username": "Uporabniško ime",
+        "password": "Geslo",
+        "login_button": "Prijavi se",
+        "login_error": "Napačno uporabniško ime ali geslo.",
+        "connection_error": "Napaka pri povezavi s strežnikom.",
+        "competitions": "Tekmovanja",
+        "results": "Rezultati",
+        "competitors": "Tekmovalci",
+        "validation": "Validacija",
+        "comparison": "Primerjava",
+        "compare": "Primerjaj",
+        "select_first": "Nastavi kot prvega",
+        "select_second": "Nastavi kot drugega",
+        "selected_first": "Prvi tekmovalec",
+        "selected_second": "Drugi tekmovalec",
+        "search": "Išči",
+        "add": "Dodaj",
+        "edit": "Uredi",
+        "delete": "Izbriši",
+        "refresh": "Osveži",
+        "incomplete_results": "Nepopolni rezultati",
+        "duplicates": "Duplikati",
+        "language": "Jezik",
+        "changes": "Spremembe"
+    },
+    "en": {
+        "app_title": "Triathlon Results Administration",
+        "login": "Login",
+        "username": "Username",
+        "password": "Password",
+        "login_button": "Log in",
+        "login_error": "Invalid username or password.",
+        "connection_error": "Server connection error.",
+        "competitions": "Competitions",
+        "results": "Results",
+        "competitors": "Competitors",
+        "validation": "Validation",
+        "comparison": "Comparison",
+        "compare": "Compare",
+        "select_first": "Set as first",
+        "select_second": "Set as second",
+        "selected_first": "First competitor",
+        "selected_second": "Second competitor",
+        "search": "Search",
+        "add": "Add",
+        "edit": "Edit",
+        "delete": "Delete",
+        "refresh": "Refresh",
+        "incomplete_results": "Incomplete results",
+        "duplicates": "Duplicates",
+        "language": "Language",
+        "changes": "Changes"
+    }
+}
+
+
+def t(lang, key):
+    return TRANSLATIONS.get(lang, TRANSLATIONS["sl"]).get(key, key)
