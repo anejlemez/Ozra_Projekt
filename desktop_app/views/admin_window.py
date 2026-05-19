@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 
 from translations import t
+from ui_style import apply_base_style
 
 from views.rezultat_form import RezultatForm
 
@@ -40,6 +41,7 @@ class AdminWindow(QMainWindow):
 
         self.setWindowTitle(t(self.lang, "app_title"))
         self.setGeometry(200, 100, 1200, 700)
+        apply_base_style(self)
 
         self.init_ui()
         self.load_tekmovanja()
@@ -48,11 +50,14 @@ class AdminWindow(QMainWindow):
     def init_ui(self):
         main_widget = QWidget()
         main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(14, 14, 14, 14)
+        main_layout.setSpacing(10)
 
         top_layout = QHBoxLayout()
 
         self.title_label = QLabel(t(self.lang, "app_title"))
-        self.title_label.setStyleSheet("font-size: 20px; font-weight: bold;")
+        self.title_label.setObjectName("SectionTitle")
+        self.title_label.setWordWrap(True)
 
         self.language_label = QLabel(t(self.lang, "language"))
         self.language_select = QComboBox()
@@ -70,6 +75,7 @@ class AdminWindow(QMainWindow):
         top_layout.addWidget(self.language_select)
 
         self.tabs = QTabWidget()
+        self.tabs.setDocumentMode(True)
 
         self.tab_tekmovanja = QWidget()
         self.tab_tekmovalci = QWidget()
@@ -97,6 +103,8 @@ class AdminWindow(QMainWindow):
 
     def init_tekmovanja_tab(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(8)
 
         button_layout = QHBoxLayout()
 
@@ -152,6 +160,8 @@ class AdminWindow(QMainWindow):
 
     def init_tekmovalci_tab(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(8)
 
         search_layout = QHBoxLayout()
 
@@ -189,6 +199,8 @@ class AdminWindow(QMainWindow):
 
     def init_validacija_tab(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(8)
 
         button_layout = QHBoxLayout()
 
@@ -417,6 +429,8 @@ class AdminWindow(QMainWindow):
 
     def init_primerjava_tab(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(8)
 
         search_layout = QHBoxLayout()
 
@@ -710,6 +724,8 @@ class AdminWindow(QMainWindow):
 
     def init_spremembe_tab(self):
         layout = QVBoxLayout()
+        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setSpacing(8)
 
         button_layout = QHBoxLayout()
 
