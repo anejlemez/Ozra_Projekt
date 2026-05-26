@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <title>Triatlon rezultati</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid">
+            <span class="navbar-brand fw-bold" data-i18n="appTitle">
+                Triatlon rezultati
+            </span>
+
+            <div class="d-flex align-items-center gap-2">
+                <label for="languageSelect" class="text-white" data-i18n="language">Jezik</label>
+                <select id="languageSelect" class="form-select form-select-sm">
+                    <option value="sl">Slovenščina</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container-fluid p-4">
+        <section class="hero-card mb-4">
+            <h1 data-i18n="heroTitle">Spletni pregled triatlonskih rezultatov</h1>
+            <p data-i18n="heroText">
+                Pregledujte tekmovanja, rezultate, nastope tekmovalcev in primerjajte dosežke.
+            </p>
+        </section>
+
+        <div id="alertBox" class="alert d-none" role="alert"></div>
+
+        <ul class="nav nav-tabs mb-3" id="mainTabs">
+            <li class="nav-item">
+                <button class="nav-link active" data-tab="competitionsTab" data-i18n="competitions">
+                    Tekmovanja
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-tab="competitorsTab" data-i18n="competitors">
+                    Tekmovalci
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-tab="comparisonTab" data-i18n="comparison">
+                    Primerjava
+                </button>
+            </li>
+        </ul>
+
+        <section id="competitionsTab" class="tab-section">
+            <div class="row g-3">
+                <div class="col-xl-5">
+                    <div class="card shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <strong data-i18n="competitions">Tekmovanja</strong>
+                            <button id="refreshCompetitionsBtn" class="btn btn-sm btn-outline-primary" data-i18n="refresh">
+                                Osveži
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive table-box">
+                                <table class="table table-hover table-sm align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th data-i18n="name">Naziv</th>
+                                            <th data-i18n="year">Leto</th>
+                                            <th data-i18n="type">Tip</th>
+                                            <th data-i18n="location">Lokacija</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="competitionsTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-7">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                                <strong>
+                                    <span data-i18n="results">Rezultati</span>
+                                    <span id="selectedCompetitionText" class="text-muted"></span>
+                                </strong>
+
+                                <div class="d-flex gap-2">
+                                    <input
+                                        id="divisionFilterInput"
+                                        class="form-control form-control-sm"
+                                        type="text"
+                                        data-placeholder-i18n="divisionFilter"
+                                        placeholder="Filter po diviziji"
+                                    >
+                                    <button id="clearResultsFilterBtn" class="btn btn-sm btn-outline-secondary" data-i18n="clear">
+                                        Počisti
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <p id="resultsInfo" class="small text-muted mb-2"></p>
+
+                            <div class="table-responsive table-box large">
+                                <table class="table table-striped table-sm align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th data-i18n="competitor">Tekmovalec</th>
+                                            <th>Overall</th>
+                                            <th>Gender</th>
+                                            <th>Div</th>
+                                            <th>Bib</th>
+                                            <th data-i18n="division">Divizija</th>
+                                            <th data-i18n="swim">Plavanje</th>
+                                            <th data-i18n="bike">Kolesarjenje</th>
+                                            <th data-i18n="run">Tek</th>
+                                            <th data-i18n="totalTime">Skupni čas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultsTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="competitorsTab" class="tab-section d-none">
+            <div class="row g-3">
+                <div class="col-xl-5">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <strong data-i18n="searchCompetitor">Iskanje tekmovalca</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-group mb-3">
+                                <input
+                                    id="competitorSearchInput"
+                                    class="form-control"
+                                    type="text"
+                                    data-placeholder-i18n="enterCompetitorName"
+                                    placeholder="Vnesi ime tekmovalca"
+                                >
+                                <button id="searchCompetitorBtn" class="btn btn-primary" data-i18n="search">
+                                    Išči
+                                </button>
+                            </div>
+
+                            <div class="table-responsive table-box">
+                                <table class="table table-hover table-sm align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th data-i18n="fullName">Ime in priimek</th>
+                                            <th data-i18n="age">Starost</th>
+                                            <th data-i18n="country">Država</th>
+                                            <th data-i18n="actions">Akcije</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="competitorsTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-7">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <strong>
+                                <span data-i18n="performances">Nastopi</span>
+                                <span id="selectedCompetitorText" class="text-muted"></span>
+                            </strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <div class="stat-card">
+                                        <div class="stat-label" data-i18n="bestTime">Najboljši čas</div>
+                                        <div id="bestTimeValue" class="stat-value">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-card">
+                                        <div class="stat-label" data-i18n="numberOfPerformances">Število nastopov</div>
+                                        <div id="performanceCountValue" class="stat-value">-</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="stat-card">
+                                        <div class="stat-label" data-i18n="selectedCompetitor">Izbran tekmovalec</div>
+                                        <div id="selectedCompetitorValue" class="stat-value small">-</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive table-box large">
+                                <table class="table table-striped table-sm align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Overall</th>
+                                            <th>Gender</th>
+                                            <th>Div</th>
+                                            <th>Bib</th>
+                                            <th data-i18n="division">Divizija</th>
+                                            <th data-i18n="swim">Plavanje</th>
+                                            <th data-i18n="bike">Kolesarjenje</th>
+                                            <th data-i18n="run">Tek</th>
+                                            <th data-i18n="totalTime">Skupni čas</th>
+                                            <th data-i18n="competitionId">Tekmovanje ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="performancesTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparisonTab" class="tab-section d-none">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <strong data-i18n="comparison">Primerjava</strong>
+                </div>
+
+                <div class="card-body">
+                    <p class="text-muted" data-i18n="comparisonHelp">
+                        Tekmovalca izberi v zavihku Tekmovalci z gumboma Izberi 1 in Izberi 2.
+                    </p>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-5">
+                            <div class="selected-box">
+                                <div class="text-muted small" data-i18n="competitorOne">Tekmovalec 1</div>
+                                <div id="comparisonCompetitorOne" class="fw-bold">-</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <div class="selected-box">
+                                <div class="text-muted small" data-i18n="competitorTwo">Tekmovalec 2</div>
+                                <div id="comparisonCompetitorTwo" class="fw-bold">-</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2 d-grid">
+                            <button id="compareBtn" class="btn btn-primary" data-i18n="compare">
+                                Primerjaj
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="statistic">Statistika</th>
+                                    <th data-i18n="competitorOne">Tekmovalec 1</th>
+                                    <th data-i18n="competitorTwo">Tekmovalec 2</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparisonTableBody">
+                                <tr>
+                                    <td data-i18n="numberOfPerformances">Število nastopov</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td data-i18n="bestTime">Najboljši čas</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center text-muted py-3">
+        <small data-i18n="footerText">OZRA Naloga 4 - spletna aplikacija</small>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/translations.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
