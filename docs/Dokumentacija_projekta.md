@@ -147,6 +147,10 @@ Nato je treba:
 python uvoz.py
 ```
 
+2. nato naloži vse pakete
+```powershell
+pip install -r requirements.txt
+```
 2. Zaženi Flask strežnik in spletni vmesnik:
 
 ```powershell
