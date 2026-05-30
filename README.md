@@ -1,4 +1,4 @@
-# Naloga 3: Sistem za spremljanje triatlonskih rezultatov
+# Projekt OZRA
 
 ## 1 Namen projekta
 
