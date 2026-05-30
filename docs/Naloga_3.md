@@ -1,147 +1,188 @@
 # Naloga 3: Sistem za spremljanje triatlonskih rezultatov
 
-## 1 Uvod
+## 1 Namen projekta
 
-V tej nalogi je načrtovan informacijski sistem za spremljanje rezultatov triatlonskih tekmovanj po naročilu stranke Bruno. Sistem je namenjen shranjevanju, obdelavi in prikazu rezultatov iz tekmovanj IRONMAN, IRONMAN 70.3 in UltraTriatlon.
+Namen projekta je izdelava informacijskega sistema za pregled, analizo in upravljanje rezultatov triatlonskih tekmovanj. Sistem obravnava podatke za tekmovanja tipa IRONMAN, IRONMAN 70.3 in UltraTriatlon ter omogoča delo z rezultati tekmovalcev, primerjavo nastopov in pregled statistike.
 
-Naloga vključuje analizo testnih podatkov, načrtovanje podatkovne baze, pripravo ER modela ter uvoz podatkov iz CSV datotek v relacijsko bazo.
+Projekt je zasnovan tako, da združuje podatkovno bazo, REST API, namizno aplikacijo za administracijo in javni spletni vmesnik za pregled rezultatov.
 
-## 2 Opis projekta
+## 2 Opis rešitve
 
-Projekt predstavlja sistem za analizo rezultatov kondicijskih tekmovanj. Podatki se uvažajo iz CSV datotek, nato se shranijo v podatkovno bazo in prikazujejo uporabniku prek dveh vmesnikov:
+Rešitev je razdeljena na več logičnih delov:
 
-- administratorskega namiznega vmesnika za upravljanje podatkov,
-- uporabniškega namiznega vmesnika za pregled rezultatov in statistik.
+- uvoz podatkov iz CSV datotek v MySQL bazo,
+- Flask strežnik, ki ponuja REST API,
+- namizna aplikacija v PyQt5 za administracijo in uporabniški pregled,
+- spletni vmesnik v mapi `web_app`, ki se streže iz Flask aplikacije,
+- sloj repozitorijev in servisov, ki loči dostop do podatkov od poslovne logike.
 
-Uporabnik lahko pregleduje tekmovanja, rezultate posameznih tekmovanj in statistiko tekmovalcev. Administrator pa lahko podatke ureja, dodaja, briše in preverja njihovo pravilnost.
+Takšna razdelitev olajša vzdrževanje, testiranje in kasnejše razširitve sistema.
 
-## 3 Uporabljene tehnologije
+## 3 Struktura projekta
 
-- Python za logiko aplikacije in uvoz podatkov,
-- Flask za REST API,
-- MySQL za podatkovno bazo,
-- PyQt5 za namizni administratorski vmesnik,
+- `app.py` je vstopna točka za Flask strežnik in streže spletni vmesnik iz mape `web_app`.
+- `uvoz.py` prebere CSV datoteke in jih uvozi v MySQL bazo.
+- `db.py` vsebuje nastavitve za povezavo s podatkovno bazo.
+- `routes/` vsebuje REST končne točke.
+- `services/` vsebuje poslovno logiko in validacijo.
+- `repositories/` vsebuje SQL poizvedbe in neposreden dostop do baze.
+- `desktop_app/` vsebuje PyQt5 namizno aplikacijo, prevode, konfiguracijo in vizualni slog.
+- `web_app/` vsebuje javni spletni pregled rezultatov.
+- `docs/` vsebuje poročilo in spremljajočo dokumentacijo.
+- `installer/` in `desktop_app/TriatlonAdmin.spec` sta namenjena pripravi namestljive različice programa.
+
+## 4 Uporabljene tehnologije
+
+- Python za strežnik, uvoz podatkov in namizno aplikacijo,
+- Flask za REST API in streženje spletnega vmesnika,
+- flask-cors za dovoljenje dostopa iz odjemalcev,
+- MySQL za shranjevanje podatkov,
+- mysql-connector-python za povezavo z bazo,
+- PyQt5 za administratorski in uporabniški namizni vmesnik,
 - requests za komunikacijo namizne aplikacije z API-jem,
-- CSV datoteke kot vir testnih podatkov.
+- HTML, CSS, JavaScript in Bootstrap 5 za spletni vmesnik,
+- PyInstaller za izdelavo samostojne izvršljive datoteke.
 
-## 4 Funkcionalnost sistema
+## 5 Podatkovni model
 
-### 4.1 Administratorski vmesnik
+Osrednje entitete sistema so:
 
-- prijava administratorja v sistem,
-- uvoz podatkov v bazo iz CSV datotek,
-- pregled preteklih tekmovanj,
-- filtriranje rezultatov po posameznem tekmovanju,
-- dodajanje novega rezultata tekmovalcu,
-- urejanje obstoječega rezultata,
-- brisanje rezultata,
-- iskanje rezultatov po tekmovalčevem imenu,
-- izvoz filtriranih podatkov v CSV,
-- dnevnik vseh sprememb,
-- pregled nepopolnih rezultatov in duplikatov,
-- primerjava dveh tekmovalcev.
+- `admini` za prijavo administratorja,
+- `tekmovanja` za podatke o posameznih tekmah,
+- `tekmovalci` za osnovne podatke o športnikih,
+- `rezultati` za rezultate posameznih nastopov,
+- `spremembe` za dnevnik sprememb v bazi.
 
-### 4.2 Uporabniški namizni vmesnik
+Tabela `rezultati` je povezana s tabelama `tekmovalci` in `tekmovanja`, tabela `spremembe` pa beleži operacije nad podatki in lahko vsebuje sklic na administratorja. Tak model omogoča pregled nad tekmovanji, nastopi in zgodovino sprememb.
 
-- pregled seznama vseh tekmovanj,
-- pregled rezultatov posameznega tekmovanja,
-- iskanje tekmovalca po imenu,
-- filtriranje po starostni skupini,
-- prikaz osebnih rekordov tekmovalca,
-- prikaz povprečnih časov po disciplinah,
-- prikaz vseh nastopov posameznega tekmovalca,
-- prikaz najboljšega skupnega časa tekmovalca,
-- prikaz uvrstitve tekmovalca na posameznem tekmovanju,
-- primerjava med dvema tekmovalcema.
+## 6 Funkcionalnosti sistema
 
-## 5 Analiza testnih podatkov
+### 6.1 Administratorski namizni vmesnik
 
-Podatki za nalogo so bili podani v treh glavnih sklopih: IRONMAN, IRONMAN 70.3 in UltraTriatlon. Vsak sklop vsebuje več CSV datotek, kjer posamezna datoteka predstavlja eno tekmovanje oziroma eno dirko v določenem letu.
+- prijava administratorja ime admin geslo 1234,
+- pregled tekmovanj in rezultatov,
+- dodajanje, urejanje in brisanje rezultatov,
+- iskanje tekmovalcev po imenu,
+- prikaz nastopov izbranega tekmovalca,
+- prikaz podatkov o nepopolnih rezultatih,
+- prikaz duplikatov,
+- primerjava dveh tekmovalcev,
+- pregled dnevnika sprememb,
+- izvoz rezultatov v CSV,
+- preklop med slovenščino in angleščino.
 
-CSV datoteke vsebujejo atribute, kot so ime tekmovalca, starost, država, uvrstitve, posamezni časi disciplin in skupni čas. Pri analizi podatkov sem ugotovil, da podatki niso popolnoma konsistentni, zato je bil potreben prilagojen uvoz.
+### 6.2 Javni uporabniški vmesnik
 
-Na podlagi analize sem zaključil, da so ključne entitete sistema:
+- pregled vseh tekmovanj,
+- pregled rezultatov izbranega tekmovanja,
+- iskanje tekmovalcev po imenu,
+- filtriranje tekmovalcev po starostni skupini,
+- prikaz statistike izbranega tekmovalca,
+- prikaz najboljšega časa,
+- prikaz števila nastopov,
+- prikaz povprečij po disciplinah,
+- primerjava dveh tekmovalcev,
+- preklop jezika.
 
-- tekmovalci,
-- tekmovanja,
-- rezultati.
+### 6.3 Spletni vmesnik
 
-## 6 Načrt podatkovne baze
+Spletni vmesnik omogoča pregled tekmovanj, rezultatov, iskanje tekmovalcev in primerjavo rezultatov v brskalniku. Na voljo je tudi preklop med slovenščino in angleščino.
 
-Podatkovna baza je zasnovana na treh glavnih entitetah.
+## 7 REST API
 
-### 6.1 Tekmovalci
+Glavne poti API-ja so:
 
-- ime in priimek,
-- starost,
-- država.
+- `POST /auth/login` za prijavo administratorja,
+- `GET /tekmovanja` za seznam tekmovanj,
+- `GET /tekmovanja/<id>` za posamezno tekmovanje,
+- `GET /tekmovanja/<id>/rezultati` za rezultate tekmovanja,
+- `GET /tekmovalci/iskanje?ime=...` za iskanje tekmovalcev,
+- `GET /tekmovalci/<id>` za podatke o tekmovalcu,
+- `GET /tekmovalci/<id>/nastopi` za nastope tekmovalca,
+- `GET /tekmovalci/<id>/najboljsi-cas` za najboljši čas tekmovalca,
+- `POST /rezultati` za dodajanje rezultata,
+- `PUT /rezultati/<id>` za urejanje rezultata,
+- `DELETE /rezultati/<id>` za brisanje rezultata,
+- `GET /validacija/nepopolni` za nepopolne rezultate,
+- `GET /validacija/duplikati` za duplikate,
+- `GET /primerjava?tekmovalec1=...&tekmovalec2=...` za primerjavo dveh tekmovalcev,
+- `GET /spremembe` za dnevnik sprememb.
 
-### 6.2 Tekmovanja
+## 8 Uvoz podatkov
 
-- naziv tekmovanja,
-- leto,
-- tip tekmovanja,
-- lokacija.
+Uvoz podatkov je izveden v datoteki `uvoz.py`. Skripta pregleda CSV datoteke v mapi s testnimi podatki, iz imena datoteke določi tekmovanje, nato pa za vsako vrstico ustvari zapis tekmovalca in rezultata.
 
-### 6.3 Rezultati
+Pri uvozu skripta:
 
-- uvrstitve,
-- časi po disciplinah,
-- skupni čas,
-- povezava na tekmovalca,
-- povezava na tekmovanje.
+- čisti prazne in neveljavne vrednosti,
+- pretvori številčne podatke v ustrezne tipe,
+- preprečuje podvajanje tekmovalcev in tekmovanj,
+- združuje podatke iz različnih formatov CSV datotek,
+- batchira vstavljanje rezultatov za hitrejši uvoz.
 
-## 7 ER diagram
+Pred zagonom je treba v `uvoz.py` nastaviti pravilno pot do CSV datotek.
 
-![ER diagram](attachment:dc13449f-b82c-453b-bc2c-5321a0155f5e:image.png)
+## 9 Namestitev programa
 
-## 8 Polnjenje podatkovne baze
+Ker v projektu ni datoteke `requirements.txt`, je odvisnosti treba namestiti ročno. Priporočen postopek na Windows je naslednji:
 
-Po izdelavi ER modela in ustvarjanju tabel v podatkovni bazi je sledilo polnjenje baze s testnimi podatki iz CSV datotek.
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install flask flask-cors mysql-connector-python pyqt5 requests pyinstaller
+```
 
-Uvoz je izveden v Pythonu. Skripta pregleda vse CSV datoteke v mapah IRONMAN, IRONMAN 70.3 in UltraTriatlon ter podatke zapisuje v bazo. Pri uvozu se najprej preberejo podatki o tekmovanju, kot so naziv, leto, tip tekmovanja in lokacija. Nato se za vsako vrstico CSV preveri, ali tekmovalec že obstaja v bazi. Če še ne obstaja, se doda nov zapis v tabelo tekmovalci. Na koncu se ustvari še zapis v tabeli rezultati.
+Nato je treba:
 
-Ker testni podatki vsebujejo tudi prazne in nepravilne vrednosti, skripta prazna polja pretvori v `NULL`, časovne podatke pa shrani kot besedilo, kjer je to potrebno za lažji uvoz. Poleg tega preverja obstoječe tekmovalce, da se prepreči podvajanje podatkov.
+- zagnati MySQL strežnik,
+- ustvariti bazo `mydb`,
+- preveriti podatke za prijavo v `db.py` in po potrebi prilagoditi naslov, uporabnika, geslo in port,
+- preveriti, ali je v `uvoz.py` pravilno nastavljena pot do CSV virov.
 
-## 9 Statistika polnjenja baze
+## 10 Zagon programa
 
-![Count rezultatov po 50min delovanja](attachment:76cc329e-707f-4cb0-b6d7-c4c727c62deb:image.png)
+1. Najprej uvozi podatke v bazo:
 
-Count rezultatov po 50min delovanja.
+```powershell
+python uvoz.py
+```
 
-![Count tekmovalcev po 50min delovanja](attachment:6b058212-5194-4f08-83f5-49e547309342:image.png)
+2. Zaženi Flask strežnik in spletni vmesnik:
 
-Count tekmovalcev po 50min delovanja.
+```powershell
+python app.py
+```
 
-## 10 Validacija in večjezičnost
+3. Odpri spletni pregled v brskalniku na naslovu `http://127.0.0.1:5000`.
 
-Pri vnosu in urejanju podatkov sistem preverja obvezna polja ter ustreznost tipov podatkov. Številčna polja morajo biti zapisana kot celo ali decimalno število, prazna neobvezna polja pa se shranijo kot prazna vrednost oziroma `NULL`.
+4. Zaženi namizno aplikacijo:
 
-Namizna aplikacija podpira slovenščino in angleščino. Prevajanje uporabniškega vmesnika je izvedeno centralno, zato je mogoče enostavno menjati jezik aplikacije.
+```powershell
+python desktop_app/main.py
+```
 
-## 11 REST povezave
+5. V namizni aplikaciji se lahko prijavi administrator ali pa se odpre javni uporabniški pogled.
 
-Sistem uporablja REST API za povezavo med administrativnim in uporabniškim namiznim vmesnikom ter strežnikom. Glavne povezave so:
+## 11 Uporaba programa
 
-- `POST /auth/login` - prijava administratorja,
-- `GET /tekmovanja` - seznam tekmovanj,
-- `GET /tekmovanja/<id>/rezultati` - rezultati izbranega tekmovanja,
-- `GET /tekmovalci/iskanje?ime=...` - iskanje tekmovalcev,
-- `GET /tekmovalci/<id>/nastopi` - nastopi izbranega tekmovalca,
-- `POST /rezultati` - dodajanje rezultata,
-- `PUT /rezultati/<id>` - urejanje rezultata,
-- `DELETE /rezultati/<id>` - brisanje rezultata,
-- `GET /validacija/nepopolni` - nepopolni rezultati,
-- `GET /validacija/duplikati` - duplikati,
-- `GET /primerjava?tekmovalec1=...&tekmovalec2=...` - primerjava dveh tekmovalcev,
-- `GET /spremembe` - dnevnik sprememb.
+### 11.1 Administratorski potek
 
-## 12 Installer
+Administrator se najprej prijavi v sistem. Po prijavi dobi dostop do zavihkov za tekmovanja, tekmovalce, primerjavo, validacijo in spremembe. V zavihku tekmovanj lahko izbira posamezna tekmovanja in upravlja rezultate. V zavihku tekmovalcev lahko išče športnike in prikazuje njihove nastope. V zavihku validacije lahko pregleda nepopolne zapise in duplikate, v zavihku sprememb pa zgodovino operacij.
 
-Namizna aplikacija se zažene iz datoteke `desktop_app/main.py`. Za distribucijo v okolju Windows je primerna izdelava samostojne `.exe` datoteke s pomočjo orodja PyInstaller, nato pa je mogoče pripraviti še namestitveni paket z orodjem, kot je Inno Setup.
+### 11.2 Uporabniški potek
+
+Uporabnik brez prijave lahko pregleduje javni pogled, kjer izbira tekmovanje, gleda rezultate, išče tekmovalce, preverja statistiko posameznega tekmovalca in primerja dva športnika med seboj.
+
+### 11.3 Spletni potek
+
+V brskalniku je na voljo enostaven javni pregled rezultatov. Uporabnik lahko preklaplja med zavihki tekmovanj, tekmovalcev in primerjave, filtrira rezultate po diviziji ter preklaplja jezik vmesnika.
+
+## 12 Priprava izvršljive datoteke
+
+Za izdelavo samostojne izvršljive datoteke je pripravljen PyInstaller opis `desktop_app/TriatlonAdmin.spec`. S tem je mogoče namizno aplikacijo zapakirati v `.exe` datoteko za Windows distribucijo.
 
 ## 13 Zaključek
 
-Na koncu je pripravljen sistem za spremljanje rezultatov triatlonskih tekmovanj. Na začetku sem analiziral zahteve projekta in na tej osnovi določil funkcionalnosti za administracijo in uporabnika. Nato sem pripravil ER model in podatkovno bazo.
+Projekt predstavlja celovito rešitev za delo s triatlonskimi rezultati. Vključuje uvoz podatkov iz CSV datotek, strukturirano podatkovno bazo, REST API, administratorski in uporabniški namizni vmesnik ter javni spletni pregled.
 
-Sledi še uvoz podatkov iz CSV datotek, pri čemer je bilo treba upoštevati odstopanja v testnih podatkih. Sistem zato vključuje tudi validacijo podatkov, dnevnik sprememb in večjezični uporabniški vmesnik.
+Rešitev podpira pregled tekmovanj, analizo rezultatov, validacijo podatkov, dnevnik sprememb, primerjavo tekmovalcev in večjezičnost, zato je primerna kot zaključena programska rešitev za prikaz in obdelavo triatlonskih podatkov.
